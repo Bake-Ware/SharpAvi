@@ -142,6 +142,15 @@ namespace SharpAvi.Sample
             set { SetValue(MinimizeOnStartProperty, value); }
         }
 
+        public static readonly DependencyProperty CaptureMouseProperty =
+            DependencyProperty.Register("CaptureMouseOnScreen", typeof(bool), typeof(SettingsWindow));
+
+        public bool CaptureMouseOnScreen
+        {
+            get { return (bool)GetValue(CaptureMouseProperty); }
+            set { SetValue(CaptureMouseProperty, value); }
+        }
+
         public IEnumerable<CodecInfo> AvailableCodecs
         {
             get;

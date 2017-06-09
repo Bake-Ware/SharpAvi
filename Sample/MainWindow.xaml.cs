@@ -83,9 +83,15 @@ namespace SharpAvi.Sample
 
             lastFileName = System.IO.Path.Combine(outputFolder, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".avi");
             var bitRate = Mp3AudioEncoderLame.SupportedBitRates.OrderBy(br => br).ElementAt(audioQuality);
-            recorder = new Recorder(lastFileName, 
-                encoder, encodingQuality, 
-                audioSourceIndex, audioWaveFormat, encodeAudio, bitRate);
+            recorder = new Recorder(
+                lastFileName, 
+                encoder, 
+                encodingQuality, 
+                captureMouse,
+                audioSourceIndex, 
+                audioWaveFormat, 
+                encodeAudio, 
+                bitRate);
 
             recordingStopwatch.Start();
         }
@@ -129,6 +135,7 @@ namespace SharpAvi.Sample
         private bool encodeAudio;
         private int audioQuality;
         private bool minimizeOnStart;
+        private bool captureMouse;
 
         private void InitDefaultSettings()
         {
@@ -137,6 +144,8 @@ namespace SharpAvi.Sample
 
             encoder = KnownFourCCs.Codecs.MotionJpeg;
             encodingQuality = 70;
+
+            captureMouse = true;
 
             audioSourceIndex = -1;
             audioWaveFormat = SupportedWaveFormat.WAVE_FORMAT_44M16;
@@ -158,7 +167,8 @@ namespace SharpAvi.Sample
                 AudioWaveFormat = audioWaveFormat,
                 EncodeAudio = encodeAudio,
                 AudioQuality = audioQuality,
-                MinimizeOnStart = minimizeOnStart
+                MinimizeOnStart = minimizeOnStart,
+                CaptureMouseOnScreen = captureMouse
             };
             
             if (dlg.ShowDialog() == true)
@@ -171,6 +181,7 @@ namespace SharpAvi.Sample
                 encodeAudio = dlg.EncodeAudio;
                 audioQuality = dlg.AudioQuality;
                 minimizeOnStart = dlg.MinimizeOnStart;
+                captureMouse = dlg.CaptureMouseOnScreen;
             }
         }
 

@@ -130,6 +130,9 @@
                           Margin="0,7,0,0">
                     Minimize on capture start
                 </CheckBox>
+                <CheckBox Foreground="DarkGray"
+                    IsChecked="{Binding CaptureMouseOnScreen, Mode=TwoWay}"
+                    Margin="0,7,0,0" Content="Capture Mouse Cursor"/>
             </StackPanel>
         </DockPanel>
     </Border>
