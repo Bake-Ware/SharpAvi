@@ -143,6 +143,8 @@
     <Compile Include="Codecs\IAudioEncoder.cs" />
     <Compile Include="Codecs\Mp3AudioEncoderLame.cs" />
     <Compile Include="Codecs\Mp3AudioEncoderLame.ILameFacade.cs" />
+    <Compile Include="GDIStuff.cs" />
+    <Compile Include="Win32Stuff.cs" />
     <EmbeddedResource Include="Codecs\LameFacadeImpl.cs" />
     <Compile Include="Codecs\SingleThreadedVideoEncoderWrapper.cs" />
     <Compile Include="Index1Entry.cs" />

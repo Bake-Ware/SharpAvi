@@ -28,9 +28,10 @@ namespace SharpAvi.Sample
         private readonly ManualResetEvent stopThread = new ManualResetEvent(false);
         private readonly AutoResetEvent videoFrameWritten = new AutoResetEvent(false);
         private readonly AutoResetEvent audioBlockWritten = new AutoResetEvent(false);
+        private bool CaptureMouse = true;
 
         public Recorder(string fileName, 
-            FourCC codec, int quality, 
+            FourCC codec, int quality, bool captureMouse,
             int audioSourceIndex, SupportedWaveFormat audioWaveFormat, bool encodeAudio, int audioBitRate)
         {
             System.Windows.Media.Matrix toDevice;
@@ -48,7 +49,7 @@ namespace SharpAvi.Sample
                 FramesPerSecond = 10,
                 EmitIndex1 = true,
             };
-
+            CaptureMouse = captureMouse;
             // Create video stream
             videoStream = CreateVideoStream(codec, quality);
             // Set only name. Other properties were when creating stream, 
@@ -228,22 +229,38 @@ namespace SharpAvi.Sample
 #endif
             }
         }
-
+        [DllImport("user32.dll")]
+        static extern bool DrawIcon(IntPtr hDC, int X, int Y, IntPtr hIcon);
         private void GetScreenshot(byte[] buffer)
         {
             using (var bitmap = new Bitmap(screenWidth, screenHeight))
             using (var graphics = Graphics.FromImage(bitmap))
             {
                 graphics.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(screenWidth, screenHeight));
+                if (CaptureMouse)
+                {
+                    Win32Stuff.CURSORINFO pci;
+                    pci.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Win32Stuff.CURSORINFO));
+
+                    if (Win32Stuff.GetCursorInfo(out pci))
+                    {
+                        if (pci.flags == Win32Stuff.CURSOR_SHOWING)
+                        {
+                            DrawIcon(graphics.GetHdc(), pci.ptScreenPos.x, pci.ptScreenPos.y, pci.hCursor);
+                            graphics.ReleaseHdc();
+                        }
+                    }
+                }
                 var bits = bitmap.LockBits(new Rectangle(0, 0, screenWidth, screenHeight), ImageLockMode.ReadOnly, PixelFormat.Format32bppRgb);
                 Marshal.Copy(bits.Scan0, buffer, 0, buffer.Length);
                 bitmap.UnlockBits(bits);
 
                 // Should also capture the mouse cursor here, but skipping for simplicity
                 // For those who are interested, look at http://www.codeproject.com/Articles/12850/Capturing-the-Desktop-Screen-with-the-Mouse-Cursor
+                //this shit didn't work very well for me. I used that with this https://stackoverflow.com/questions/6750056/how-to-capture-the-screen-and-mouse-pointer-using-windows-apis
+
             }
         }
-
         private void audioSource_DataAvailable(object sender, WaveInEventArgs e)
         {
             var signalled = WaitHandle.WaitAny(new WaitHandle[] { videoFrameWritten, stopThread });
